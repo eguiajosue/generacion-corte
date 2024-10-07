@@ -17,5 +17,16 @@
   },
   "homepage": "https://github.com/eguiajosue/generacion-corte#readme",
   "devDependencies": {
+    "electron": "^32.1.2",
+    "electron-reload": "^2.0.0-alpha.1",
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.6.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5"
   }
 }
