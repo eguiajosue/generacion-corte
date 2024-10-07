@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -24,9 +24,27 @@ function createWindow() {
   win.maximize();
 
   win.loadFile('renderer/index.html');
-  // Opcional: Abrir las herramientas de desarrollo para depuración
-  // win.webContents.openDevTools();
 }
+
+// Crear el menú con solo una opción de ayuda
+const template = [
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'Learn More',
+        click: () => {
+          // Enviar un evento al proceso de renderizado para mostrar el modal
+          BrowserWindow.getAllWindows()[0].webContents.send('mostrar-ayuda-modal');
+        },
+      },
+    ],
+  },
+];
+
+// Aplicar el menú
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
 
 app.whenReady().then(() => {
   createWindow();
@@ -62,4 +80,3 @@ ipcMain.on('guardar-tipo-cambio', (event, tipoCambio) => {
     console.error('Error al guardar el tipo de cambio: ', error);
   }
 });
-
