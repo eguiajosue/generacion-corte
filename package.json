@@ -15,5 +15,7 @@
   "bugs": {
     "url": "https://github.com/eguiajosue/generacion-corte/issues"
   },
-  "homepage": "https://github.com/eguiajosue/generacion-corte#readme"
+  "homepage": "https://github.com/eguiajosue/generacion-corte#readme",
+  "devDependencies": {
+  }
 }
