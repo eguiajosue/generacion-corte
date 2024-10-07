@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corte de Caja</title>
+  <!-- Bootstrap CSS -->
+  <style>
+    .default-font {
+      font-family: 'arial';
+      /* Esto asegura que use la fuente por defecto del navegador */
+    }
+
+    /* Asegurar que el body ocupe el 100% del alto de la ventana */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Asegurar que el contenedor principal también ocupe el 100% del alto */
+    .container-fluid {
+      height: 100%;
+    }
+
+    /* Asegurar que la columna izquierda esté centrada y fija */
+    #columna-izquierda {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      /* Ocupa el 100% del viewport */
+      position: sticky;
+      top: 0;
+    }
+
+    /* La columna derecha debe poder hacer scroll */
+    #columna-derecha {
+      overflow-y: auto;
+    }
+
+    #botones-superiores {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      /* Asegúrate de que los botones siempre queden por encima del contenido */
+      background-color: #f8f9fa;
+      /* Color de fondo similar al de la página */
+      padding: 10px 0;
+    }
+  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+  <div class="container-fluid">
+    <!-- Pantalla principal con los formularios y el reporte -->
+    <div id="pantallaPrincipal" class="row h-100">
+      <!-- Columna izquierda centrada verticalmente con el título y los formularios -->
+      <div id="columna-izquierda" class="col-md-9">
+        <!-- Botones superiores -->
+        <div id="botones-superiores" class="d-flex justify-content-end gap-2 mb-4">
+          <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
+            data-bs-target="#tipoCambioModal">
+            <i class="bi bi-cash"></i> Configurar Tipo de Cambio
+          </button>
+          <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#alcanzareNomina">
+            <i class="bi bi-cash"></i> ¿Alcanzaré a cobrar mi nómina?
+          </button>
+          <button type="button" id="generarCorte" class="btn btn-primary">
+            <i class="bi bi-clipboard-check"></i> Generar Corte de Caja
+          </button>
+        </div>
+
+
+        <!-- Formularios de las Librerías y Tiendas -->
+        <div class="row g-4">
+          <!-- Librería 1 -->
+          <div class="col-md-6">
+            <form id="corteForm1" class="card p-4 shadow-sm">
+              <h4 class="h4 text-center mb-4">
+                <i class="bi bi-shop"></i> LIBRERÍA 1
+              </h4>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="totalLibreria1" class="form-control" step="0.01" required>
+                  <label for="totalLibreria1">Total</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="tarjetaLibreria1" class="form-control" step="0.01" required>
+                  <label for="tarjetaLibreria1">Tarjeta</label>
+                </div>
+              </div>
+              <div id="vales-container1" class="mb-3"></div>
+              <button type="button" id="agregarVale1" class="btn btn-outline-secondary w-100 mb-3">
+                <i class="bi bi-plus-circle"></i> Agregar Vale
+              </button>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="dolaresLibreria1" class="form-control" step="0.01">
+                  <label for="dolaresLibreria1">Dólares</label>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Librería 2 -->
+          <div class="col-md-6">
+            <form id="corteForm2" class="card p-4 shadow-sm">
+              <h3 class="h4 text-center mb-4">
+                <i class="bi bi-shop"></i> LIBRERÍA 2
+              </h3>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="totalLibreria2" class="form-control" step="0.01" required>
+                  <label for="totalLibreria2">Total</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="tarjetaLibreria2" class="form-control" step="0.01" required>
+                  <label for="tarjetaLibreria2">Tarjeta</label>
+                </div>
+              </div>
+              <div id="vales-container2" class="mb-3"></div>
+              <button type="button" id="agregarVale2" class="btn btn-outline-secondary w-100 mb-3">
+                <i class="bi bi-plus-circle"></i> Agregar Vale
+              </button>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="dolaresLibreria2" class="form-control" step="0.01">
+                  <label for="dolaresLibreria2">Dólares</label>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Segunda fila: Tienda 1 y Tienda 2 -->
+        <div class="row g-4 mt-4">
+          <!-- Tienda 1 -->
+          <div class="col-md-6">
+            <form id="corteForm3" class="card p-4 shadow-sm">
+              <h3 class="h4 text-center mb-4">
+                <i class="bi bi-shop-window"></i> TIENDA 1
+              </h3>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="totalTienda1" class="form-control" step="0.01" required>
+                  <label for="totalTienda1">Total</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="tarjetaTienda1" class="form-control" step="0.01" required>
+                  <label for="tarjetaTienda1">Tarjeta</label>
+                </div>
+              </div>
+              <div id="vales-container3" class="mb-3"></div>
+              <button type="button" id="agregarVale3" class="btn btn-outline-secondary w-100 mb-3">
+                <i class="bi bi-plus-circle"></i> Agregar Vale
+              </button>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="dolaresTienda1" class="form-control" step="0.01">
+                  <label for="dolaresTienda1">Dólares</label>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tienda 2 -->
+          <div class="col-md-6">
+            <form id="corteForm4" class="card p-4 shadow-sm">
+              <h3 class="h4 text-center mb-4">
+                <i class="bi bi-shop-window"></i> TIENDA 2
+              </h3>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="totalTienda2" class="form-control" step="0.01" required>
+                  <label for="totalTienda2">Total</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="tarjetaTienda2" class="form-control" step="0.01" required>
+                  <label for="tarjetaTienda2">Tarjeta</label>
+                </div>
+              </div>
+              <div id="vales-container4" class="mb-3"></div>
+              <button type="button" id="agregarVale4" class="btn btn-outline-secondary w-100 mb-3">
+                <i class="bi bi-plus-circle"></i> Agregar Vale
+              </button>
+              <div class="mb-3">
+                <div class="form-floating">
+                  <input type="number" id="dolaresTienda2" class="form-control" step="0.01">
+                  <label for="dolaresTienda2">Dólares</label>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha con el reporte que podrá hacer scroll -->
+      <div id="columna-derecha" class="col-md-3 d-flex flex-column h-100 vh-100 overflow-auto">
+        <div id="reporte" class="card p-4 shadow-md border-dark text-center flex-grow-1 default-font">
+          <!-- Contenido del reporte -->
+
+          <!-- Librería 1 -->
+          <p><strong>CORTE DE CAJA 1</strong></p>
+          <p><strong>LIBRERIA TALAMÁS</strong></p>
+          <p><strong id="reporte-fechaLibreria1"></strong></p>
+          <p><strong>Total:</strong> $<span id="reporte-totalLibreria1">0.00</span></p>
+          <p><strong>Efectivo:</strong> $<span id="reporte-efectivoLibreria1">0.00</span></p>
+          <p id="dolares-pesosLibreria1">
+            <span>(</span><strong>Dólares:</strong> $<span id="reporte-dolaresLibreria1">0.00</span>,
+            <strong>Pesos:</strong> $<span id="reporte-pesosLibreria1">0.00)</span>
+          </p>
+          <p><strong>Tarjeta:</strong> $<span id="reporte-tarjetaLibreria1">0.00</span></p>
+          <p><strong>Vales:</strong> $<span id="reporte-valesLibreria1">0.00</span></p>
+          <p id="reporte-listaValesLibreria1"></p>
+
+          <!-- Librería 2 -->
+          <p><strong>CORTE DE CAJA 2</strong></p>
+          <p><strong>LIBRERIA TALAMÁS</strong></p>
+          <p><strong id="reporte-fechaLibreria2"></strong></p>
+          <p><strong>Total:</strong> $<span id="reporte-totalLibreria2">0.00</span></p>
+          <p><strong>Efectivo:</strong> $<span id="reporte-efectivoLibreria2">0.00</span></p>
+          <p id="dolares-pesosLibreria2">
+            <span>(</span><strong>Dólares:</strong> $<span id="reporte-dolaresLibreria2">0.00</span>,
+            <strong>Pesos:</strong> $<span id="reporte-pesosLibreria2">0.00)</span>
+          </p>
+          <p><strong>Tarjeta:</strong> $<span id="reporte-tarjetaLibreria2">0.00</span></p>
+          <p><strong>Vales:</strong> $<span id="reporte-valesLibreria2">0.00</span></p>
+          <p id="reporte-listaValesLibreria2"></p>
+
+          <!-- Tienda 1 -->
+          <p><strong>CORTE DE CAJA 1</strong></p>
+          <p><strong>TIENDA DE REGALOS TALAMÁS</strong></p>
+          <p><strong id="reporte-fechaTienda1"></strong></p>
+          <p><strong>Total:</strong> $<span id="reporte-totalTienda1">0.00</span></p>
+          <p><strong>Efectivo:</strong> $<span id="reporte-efectivoTienda1">0.00</span></p>
+          <p id="dolares-pesosTienda1">
+            <span>(</span><strong>Dólares:</strong> $<span id="reporte-dolaresTienda1">0.00</span>,
+            <strong>Pesos:</strong> $<span id="reporte-pesosTienda1">0.00)</span>
+          </p>
+          <p><strong>Tarjeta:</strong> $<span id="reporte-tarjetaTienda1">0.00</span></p>
+          <p><strong>Vales:</strong> $<span id="reporte-valesTienda1">0.00</span></p>
+          <p id="reporte-listaValesTienda1"></p>
+
+          <!-- Tienda 2 -->
+          <p><strong>CORTE DE CAJA 2</strong></p>
+          <p><strong>TIENDA DE REGALOS TALAMÁS</strong></p>
+          <p><strong id="reporte-fechaTienda2"></strong></p>
+          <p><strong>Total:</strong> $<span id="reporte-totalTienda2">0.00</span></p>
+          <p><strong>Efectivo:</strong> $<span id="reporte-efectivoTienda2">0.00</span></p>
+          <p id="dolares-pesosTienda2">
+            <span>(</span><strong>Dólares:</strong> $<span id="reporte-dolaresTienda2">0.00</span>,
+            <strong>Pesos:</strong> $<span id="reporte-pesosTienda2">0.00)</span>
+          </p>
+          <p><strong>Tarjeta:</strong> $<span id="reporte-tarjetaTienda2">0.00</span></p>
+          <p><strong>Vales:</strong> $<span id="reporte-valesTienda2">0.00</span></p>
+          <p id="reporte-listaValesTienda2"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para configurar el tipo de cambio -->
+    <div class="modal fade" id="tipoCambioModal" tabindex="-1" aria-labelledby="tipoCambioModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tipoCambioModalLabel">Configurar Tipo de Cambio</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="tipoCambioForm">
+              <div class="form-floating mb-3">
+                <input type="number" id="tipoCambio" class="form-control" step="0.01" required>
+                <label for="tipoCambio">Tipo de Cambio (Dólares)</label>
+              </div>
+              <button type="button" id="guardarTipoCambio" class="btn btn-primary w-100">Guardar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para verificar si se puede cobrar la nómina -->
+    <div class="modal fade" id="alcanzareNomina" tabindex="-1" aria-labelledby="alcanzareNominaModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="alcanzareNominaModalLabel">¿Alcanzaré a cobrar mi nómina?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="alcanzareNominaForm">
+              <div class="form-floating mb-3">
+                <input type="number" id="miNomina" class="form-control" step="0.01" required>
+                <label for="miNomina">Introduce tu nómina aquí</label>
+                <!-- Agregar un pequeño texto para mostrar el resultado -->
+                <div id="feedbackNomina" class="form-text"></div>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="number" id="nominaTotal" class="form-control" step="0.01" required>
+                <label for="nominaTotal">Total</label>
+                <div id="feedbackTotal" class="form-text"></div>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="number" id="nominaDolares" class="form-control" step="0.01">
+                <label for="nominaDolares">Dólares</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="number" id="nominaVales" class="form-control" step="0.01">
+                <label for="nominaVales">Vales</label>
+              </div>
+              <button type="button" id="verificarNomina" class="btn btn-primary w-100">Verificar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap JS y Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="renderer.js"></script>
+</body>
+
+</html>
