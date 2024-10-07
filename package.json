@@ -1,0 +1,19 @@
+{
+  "name": "generador-corte",
+  "version": "1.0.0",
+  "description": "Aplicacion de escritorio que genera el corte de caja de un establecimiento",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eguiajosue/generacion-corte.git"
+  },
+  "author": "Josue Eguia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eguiajosue/generacion-corte/issues"
+  },
+  "homepage": "https://github.com/eguiajosue/generacion-corte#readme"
+}
