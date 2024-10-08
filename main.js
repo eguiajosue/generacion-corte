@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-// Definir __dirname en módulos ES6
+// Definir __filename y __dirname en módulos ES6
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -26,25 +26,41 @@ function createWindow() {
   win.loadFile('renderer/index.html');
 }
 
-// Crear el menú con solo una opción de ayuda
-const template = [
-  {
-    label: 'Help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click: () => {
-          // Enviar un evento al proceso de renderizado para mostrar el modal
-          BrowserWindow.getAllWindows()[0].webContents.send('mostrar-ayuda-modal');
-        },
-      },
-    ],
-  },
-];
+// Crear el menú con las pestañas "File" y "Ayuda"
+// const template = [
+//   {
+//     label: 'File',
+//     submenu: [
+//       {
+//         label: 'Refresh',
+//         accelerator: 'CmdOrCtrl+R',
+//         click: () => {
+//           BrowserWindow.getFocusedWindow().reload(); // Refrescar la ventana actual
+//         },
+//       },
+//       {
+//         label: 'Exit',
+//         role: 'quit', // Rol de salida predeterminado
+//       },
+//     ],
+//   },
+//   {
+//     label: 'Ayuda',
+//     submenu: [
+//       {
+//         label: 'Cómo Usar',
+//         click: () => {
+//           // Enviar un evento al proceso de renderizado para mostrar el modal de ayuda
+//           BrowserWindow.getAllWindows()[0].webContents.send('mostrar-ayuda-modal');
+//         },
+//       },
+//     ],
+//   },
+// ];
 
-// Aplicar el menú
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+// // Aplicar el menú
+// const menu = Menu.buildFromTemplate(template);
+// Menu.setApplicationMenu(menu);
 
 app.whenReady().then(() => {
   createWindow();

@@ -5,7 +5,8 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,23 @@
     "url": "https://github.com/eguiajosue/generacion-corte/issues"
   },
   "homepage": "https://github.com/eguiajosue/generacion-corte#readme",
+  "build": {
+    "appId": "com.eguia.cortecaja",
+    "productName": "Generador Corte",
+    "directories": {
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  },
   "devDependencies": {
     "electron": "^32.1.2",
     "electron-reload": "^2.0.0-alpha.1",
