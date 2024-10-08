@@ -16,6 +16,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ayudaModal.show();
   });
 
+  function obtenerFechaActual() {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, "0");
+    const mes = hoy.getMonth() + 1;
+    const año = hoy.getFullYear();
+    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    const mesLargo = meses[mes - 1];
+    return `${dia}-${mesLargo}-${año}`;
+  }
+
   // Cargar el tipo de cambio al iniciar
   ipcRenderer.send("cargar-tipo-cambio");
 
@@ -183,6 +193,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const efectivo = calcularEfectivo(total, tarjeta, vales);
     const pesos = calcularPesos(efectivo, dolares);
 
+    function actualizarElemento(id, valor) {
+      const elemento = document.getElementById(id);
+      elemento.textContent = formatearMoneda(valor);
+      if (valor < 0) {
+        elemento.classList.add('text-danger');
+      } else {
+        elemento.classList.remove('text-danger');
+      }
+    }
+
+    actualizarElemento(`reporte-total${ubicacion}`, total);
+    actualizarElemento(`reporte-tarjeta${ubicacion}`, tarjeta);
+    actualizarElemento(`reporte-vales${ubicacion}`, vales);
+    actualizarElemento(`reporte-efectivo${ubicacion}`, efectivo);
+
+
     document.getElementById(
       `reporte-total${ubicacion}`
     ).textContent = formatearMoneda(total);
@@ -195,6 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(
       `reporte-efectivo${ubicacion}`
     ).textContent = formatearMoneda(efectivo);
+
+    document.getElementById(`reporte-fecha${ubicacion}`).textContent = obtenerFechaActual();
 
     if (dolares > 0) {
       document.getElementById(`dolares-pesos${ubicacion}`).style.display =
@@ -216,11 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
     listaValesElement.innerHTML =
       listaVales.length > 0
         ? listaVales
-            .map(
-              (vale) =>
-                `${vale.descripcion}: ${formatearMoneda(vale.valor)}`
-            )
-            .join("<br>")
+          .map(
+            (vale) =>
+              `${vale.descripcion}: ${formatearMoneda(vale.valor)}`
+          )
+          .join("<br>")
         : "";
   }
 
@@ -250,8 +278,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+    // Función para validar los formularios
+  function validarFormulario() {
+  let esValido = true;
+
+  sucursales.forEach(({ ubicacion, tipo }) => {
+    const totalInput = document.getElementById(`total${tipo}${ubicacion}`);
+    const tarjetaInput = document.getElementById(`tarjeta${tipo}${ubicacion}`);
+    const dolaresInput = document.getElementById(`dolares${tipo}${ubicacion}`);
+    const valesTotalInput = document.getElementById(`totalVales${tipo}${ubicacion}`);
+
+    const total = parseFloat(totalInput.value) || 0;
+    const tarjeta = parseFloat(tarjetaInput.value) || 0;
+    const dolares = parseFloat(dolaresInput.value) || 0;
+    const vales = parseFloat(valesTotalInput.value) || 0;
+
+    // Limpiar estados anteriores
+    totalInput.classList.remove('border-danger');
+
+    if ((tarjeta > 0 || dolares > 0 || vales > 0) && total <= 0) {
+      totalInput.classList.add('border-danger');
+      esValido = false;
+    }
+  });
+
+  return esValido;
+}
+
+
   // Lógica para generar el reporte al hacer clic en "Generar Corte"
   document.getElementById("generarCorte").addEventListener("click", () => {
+
+    // if (!validarFormulario()) {
+    //   return;
+    // }
+
     const totalLibreria1 =
       parseFloat(document.getElementById("totalLibreria1").value) || 0;
     const tarjetaLibreria1 =
@@ -331,6 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("reporte").classList.remove("d-none");
   });
+
 
   // Verificar si alcanzarás la nómina
   document.getElementById("verificarNomina").addEventListener("click", () => {
