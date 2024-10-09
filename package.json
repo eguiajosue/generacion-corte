@@ -24,6 +24,13 @@
     "directories": {
       "buildResources": "assets"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "eguiajosue",
+        "repo": "generacion-corte"
+      }
+    ],
     "files": [
       "main.js",
       "renderer.js",
@@ -37,7 +44,9 @@
   },
   "devDependencies": {
     "electron": "^32.1.2",
+    "electron-builder": "^25.1.7",
     "electron-reload": "^2.0.0-alpha.1",
+    "electron-updater": "^6.3.9",
     "eslint": "^8.57.1",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.31.0",

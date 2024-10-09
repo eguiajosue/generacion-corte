@@ -5,13 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Corte de Caja</title>
-  <!-- Bootstrap CSS -->
   <style>
     .default-font {
       font-family: 'Arial', sans-serif;
     }
 
-    /* Estructura básica */
     html,
     body {
       height: 100%;
@@ -23,17 +21,14 @@
       height: 100%;
     }
 
-    /* Ajustes de columnas */
     #columna-izquierda {
       padding: 1rem;
     }
 
-    /* Formularios más compactos */
     .form-floating {
       margin-bottom: 0.5rem;
     }
 
-    /* Botones superiores */
     #botones-superiores {
       position: sticky;
       top: 0;
@@ -42,7 +37,6 @@
       padding: 0.5rem 0;
     }
 
-    /* Ajustes para pantallas pequeñas */
     @media (max-width: 767.98px) {
       .col-md-6 {
         flex: 0 0 100%;
@@ -73,7 +67,6 @@
       }
     }
 
-    /* Ajustes generales */
     h4,
     h3 {
       font-size: 1.25rem;
@@ -83,7 +76,6 @@
       padding: 1rem;
     }
 
-    /* Contenedor de vales con scroll */
     .vales-container {
       max-height: 150px;
       overflow-y: auto;
@@ -109,7 +101,6 @@
       margin-left: 10px;
     }
 
-    /* Clases para resaltar los campos */
     .input-error {
       border-color: red !important;
     }
@@ -124,9 +115,13 @@
       cursor: not-allowed;
     }
 
-    /* Estilos para valores negativos */
     .text-danger {
       color: red;
+    }
+
+    .update-badge {
+      width: 10px;
+      height: 10px;
     }
   </style>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -136,24 +131,24 @@
 <body class="bg-light default-font">
 
   <div class="container-fluid">
-    <!-- Pantalla principal con los formularios y el reporte -->
     <div id="pantallaPrincipal" class="row h-100">
-      <!-- Columna izquierda con los formularios -->
       <div id="columna-izquierda" class="col-md-9">
-
-        <!-- Botones superiores -->
         <div id="botones-superiores"
           class="d-flex justify-content-between align-items-center gap-3 mb-3 p-3 bg-white rounded shadow-sm border">
-
-          <!-- Botón con signo de interrogación que despliega los cards al hacer clic -->
-          <div class="d-flex align-items-center">
-            <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center"
-              data-bs-toggle="modal" data-bs-target="#ayudaModal">
-              <i class="bi bi-question-circle me-2"></i>Cómo Usar
-            </button>
+          <div class="d-flex gap-3">
+            <div class="d-flex align-items-center">
+              <button id="updateButton" type="button"
+                class="btn btn-outline-primary btn-sm d-flex align-items-center position-relative" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Programa actualizado.">
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
+            </div>
+            <div class="d-flex align-items-center">
+              <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+                data-bs-toggle="modal" data-bs-target="#ayudaModal">
+                <i class="bi bi-question-circle me-2"></i>Cómo Usar
+              </button>
+            </div>
           </div>
-
-          <!-- Sección del tipo de cambio -->
           <div class="d-flex align-items-center gap-2">
             <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center"
               data-bs-toggle="modal" data-bs-target="#tipoCambioModal">
@@ -164,14 +159,11 @@
               <input type="text" id="tipoCambioActual" class="form-control text-center fw-bold" readonly>
             </div>
           </div>
-
-          <!-- Botones de acciones -->
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
               data-bs-target="#fondoCajaModal">
               <i class="bi bi-cash-coin"></i> Verificar Fondo
             </button>
-
             <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
               data-bs-target="#alcanzareNominaModal">
               <span data-bs-toggle="tooltip" title="Verificar si alcanzarás a cobrar tu nómina">
@@ -183,16 +175,12 @@
             </button>
           </div>
         </div>
-
-        <!-- Formularios de las Librerías y Tiendas -->
         <div class="row g-3">
-          <!-- Librería 1 -->
           <div class="col-md-6">
             <form id="corteForm1" class="card p-3 shadow-sm needs-validation" novalidate>
               <h4 class="text-center mb-2">
                 <i class="bi bi-shop"></i> LIBRERÍA 1
               </h4>
-              <!-- Input groups -->
               <div class="input-group mb-2">
                 <span class="input-group-text"><i class="bi bi-cash-stack"></i></span>
                 <input type="number" id="totalLibreria1" class="form-control" placeholder="Total de ventas" step="1"
@@ -219,23 +207,17 @@
                 <input type="text" id="totalValesLibreria1" class="form-control" readonly value="0.00"
                   placeholder="Total de Vales">
               </div>
-
-              <!-- Botón para agregar vale -->
               <button class="btn btn-outline-primary btn-sm w-100 p-2" id="mostrarEntradaVales1" type="button">
                 <i class="bi bi-plus-circle"></i> Agregar Vale
               </button>
-              <!-- Input para agregar vales -->
               <div id="entradaVales1" class="input-group my-2 d-none">
                 <input type="text" class="form-control" id="valeDescripcion1" placeholder="Descripción del vale">
                 <input type="number" class="form-control" id="valeValor1" placeholder="Valor del vale" step="1" min="0">
                 <button class="btn btn-success" id="guardarVale1" type="button"><i class="bi bi-save"></i></button>
               </div>
-              <!-- Contenedor para mostrar los vales agregados -->
               <div id="vales-lista1" class="list-group mb-3"></div>
             </form>
           </div>
-
-          <!-- Librería 2 -->
           <div class="col-md-6">
             <form id="corteForm2" class="card p-3 shadow-sm needs-validation" novalidate>
               <h4 class="text-center mb-2">
@@ -267,8 +249,6 @@
                 <input type="text" id="totalValesLibreria2" class="form-control" readonly value="0.00"
                   placeholder="Total de Vales">
               </div>
-
-              <!-- Botón para agregar vale -->
               <button class="btn btn-outline-primary btn-sm w-100 p-2" id="mostrarEntradaVales2" type="button">
                 <i class="bi bi-plus-circle"></i> Agregar Vale
               </button>
@@ -281,8 +261,6 @@
             </form>
           </div>
         </div>
-
-        <!-- Segunda fila: Tienda 1 y Tienda 2 -->
         <div class="row g-3 mt-3">
           <div class="col-md-6">
             <form id="corteForm3" class="card p-3 shadow-sm needs-validation" novalidate>
@@ -315,8 +293,6 @@
                 <input type="text" id="totalValesTienda1" class="form-control" readonly value="0.00"
                   placeholder="Total de Vales">
               </div>
-
-              <!-- Botón para agregar vale -->
               <button class="btn btn-outline-primary btn-sm w-100 p-2" id="mostrarEntradaVales3" type="button">
                 <i class="bi bi-plus-circle"></i> Agregar Vale
               </button>
@@ -328,7 +304,6 @@
               <div id="vales-lista3" class="list-group mb-3"></div>
             </form>
           </div>
-
           <div class="col-md-6">
             <form id="corteForm4" class="card p-3 shadow-sm needs-validation" novalidate>
               <h4 class="text-center mb-2">
@@ -360,8 +335,6 @@
                 <input type="text" id="totalValesTienda2" class="form-control" readonly value="0.00"
                   placeholder="Total de Vales">
               </div>
-
-              <!-- Botón para agregar vale -->
               <button class="btn btn-outline-primary btn-sm w-100 p-2" id="mostrarEntradaVales4" type="button">
                 <i class="bi bi-plus-circle"></i> Agregar Vale
               </button>
@@ -375,12 +348,8 @@
           </div>
         </div>
       </div>
-
-      <!-- Columna derecha con el reporte -->
       <div id="columna-derecha" class="col-md-3 d-flex flex-column h-100 vh-100 overflow-auto">
         <div id="reporte" class="card p-4 shadow-md border-dark text-center flex-grow-1 default-font d-none">
-          <!-- Contenido del reporte -->
-          <!-- Librería 1 -->
           <p><strong>CORTE DE CAJA 1<br />LIBRERIA TALAMÁS</strong><br /><strong id="reporte-fechaLibreria1"></strong>
           </p>
           <p>TOTAL: <span id="reporte-totalLibreria1">0.00</span></p>
@@ -394,8 +363,6 @@
           <p>TARJETA: <span id="reporte-tarjetaLibreria1">0.00</span></p>
           <p>VALES: <span id="reporte-valesLibreria1">0.00</span></p>
           <p id="reporte-listaValesLibreria1"></p>
-
-          <!-- Librería 2 -->
           <div id="reporte-libreria2">
             <p><strong>CORTE DE CAJA 2<br />LIBRERIA TALAMÁS</strong><br /><strong id="reporte-fechaLibreria2"></strong>
             </p>
@@ -411,8 +378,6 @@
             <p>VALES: <span id="reporte-valesLibreria2">0.00</span></p>
             <p id="reporte-listaValesLibreria2"></p>
           </div>
-
-          <!-- Tienda 1 -->
           <p><strong>CORTE DE CAJA 1<br />TIENDA DE REGALOS TALAMÁS</strong><br /><strong
               id="reporte-fechaTienda1"></strong></p>
           <p>TOTAL: <span id="reporte-totalTienda1">0.00</span></p>
@@ -426,8 +391,6 @@
           <p>TARJETA: <span id="reporte-tarjetaTienda1">0.00</span></p>
           <p>VALES: <span id="reporte-valesTienda1">0.00</span></p>
           <p id="reporte-listaValesTienda1"></p>
-
-          <!-- Tienda 2 -->
           <p><strong>CORTE DE CAJA 2<br />TIENDA DE REGALOS TALAMÁS</strong><br /><strong
               id="reporte-fechaTienda2"></strong></p>
           <p>TOTAL: <span id="reporte-totalTienda2">0.00</span></p>
@@ -445,9 +408,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Modales -->
-  <!-- Modal para configurar el tipo de cambio -->
   <div class="modal fade" id="tipoCambioModal" tabindex="-1" aria-labelledby="tipoCambioModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -472,8 +432,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal para verificar la nómina -->
   <div class="modal fade" id="alcanzareNominaModal" tabindex="-1" aria-labelledby="alcanzareNominaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -484,7 +442,6 @@
         </div>
         <div class="modal-body">
           <form id="alcanzareNominaForm" class="needs-validation" novalidate>
-            <!-- Campo para la nómina -->
             <div class="input-group mb-3">
               <span class="input-group-text"><i class="bi bi-wallet2"></i></span>
               <input type="number" id="miNomina" class="form-control" placeholder="Introduce tu nómina aquí" step="0.01"
@@ -493,11 +450,8 @@
                 Por favor, ingresa el monto de tu nómina.
               </div>
             </div>
-
-            <!-- Campos en 2 columnas -->
             <div class="row">
               <div class="col-md-6">
-                <!-- Campo para el total de ventas -->
                 <div class="input-group mb-3">
                   <span class="input-group-text"><i class="bi bi-cash-stack"></i></span>
                   <input type="number" id="nominaTotal" class="form-control" placeholder="Total de ventas" step="0.01"
@@ -508,7 +462,6 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <!-- Campo para el monto en dólares -->
                 <div class="input-group mb-3">
                   <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
                   <input type="number" id="nominaDolares" class="form-control" placeholder="Monto en dólares"
@@ -516,18 +469,14 @@
                 </div>
               </div>
             </div>
-
-            <!-- Segunda fila de columnas -->
             <div class="row">
               <div class="col-md-6">
-                <!-- Campo para vales -->
                 <div class="input-group mb-3">
                   <span class="input-group-text"><i class="bi bi-ticket-perforated"></i></span>
                   <input type="number" id="nominaVales" class="form-control" placeholder="Monto en vales" step="0.01">
                 </div>
               </div>
               <div class="col-md-6">
-                <!-- Campo para el monto en tarjeta -->
                 <div class="input-group mb-3">
                   <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
                   <input type="number" id="nominaTarjeta" class="form-control" placeholder="Monto en tarjeta"
@@ -535,8 +484,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Botón para verificar -->
             <button type="button" id="verificarNomina" class="btn btn-primary w-100"><i class="bi bi-search"></i>
               Verificar</button>
           </form>
@@ -544,8 +491,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal para verificar el fondo de caja -->
   <div class="modal fade" id="fondoCajaModal" tabindex="-1" aria-labelledby="fondoCajaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -555,11 +500,8 @@
         </div>
         <div class="modal-body">
           <form id="fondoCajaForm">
-            <!-- Instrucciones de uso -->
             <p class="text-muted text-center">Selecciona si deseas ingresar el monto total en pesos o el número de
               billetes/monedas:</p>
-
-            <!-- Radio buttons para seleccionar el modo -->
             <div class="d-flex justify-content-center mb-4">
               <div class="form-check form-check-inline me-4">
                 <input class="form-check-input" type="radio" id="inputModeCantidad" name="inputMode" value="cantidad"
@@ -571,8 +513,6 @@
                 <label class="form-check-label" for="inputModeBilletes">Número de billetes/monedas</label>
               </div>
             </div>
-
-            <!-- Tabla para organizar los campos -->
             <div class="table-responsive">
               <table class="table table-borderless align-middle">
                 <thead class="text-center">
@@ -583,8 +523,6 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Billetes y monedas -->
-                  <!-- Billetes de $500 -->
                   <tr>
                     <td class="text-center">
                       <label for="billete500Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 500</label>
@@ -596,7 +534,6 @@
                       <input type="number" min="0" id="billete500Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Billetes de $200 -->
                   <tr>
                     <td class="text-center">
                       <label for="billete200Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 200</label>
@@ -608,7 +545,6 @@
                       <input type="number" min="0" id="billete200Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Billetes de $100 -->
                   <tr>
                     <td class="text-center">
                       <label for="billete100Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 100</label>
@@ -620,7 +556,6 @@
                       <input type="number" min="0" id="billete100Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Billetes de $50 -->
                   <tr>
                     <td class="text-center">
                       <label for="billete50Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 50</label>
@@ -632,7 +567,6 @@
                       <input type="number" min="0" id="billete50Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Billetes de $20 -->
                   <tr>
                     <td class="text-center">
                       <label for="billete20Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 20</label>
@@ -644,7 +578,6 @@
                       <input type="number" min="0" id="billete20Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Monedas de $10 -->
                   <tr>
                     <td class="text-center">
                       <label for="moneda10Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 10</label>
@@ -656,7 +589,6 @@
                       <input type="number" min="0" id="moneda10Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Monedas de $5 -->
                   <tr>
                     <td class="text-center">
                       <label for="moneda5Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 5</label>
@@ -668,7 +600,6 @@
                       <input type="number" min="0" id="moneda5Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Monedas de $2 -->
                   <tr>
                     <td class="text-center">
                       <label for="moneda2Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 2</label>
@@ -680,7 +611,6 @@
                       <input type="number" min="0" id="moneda2Numero" class="form-control" step="1">
                     </td>
                   </tr>
-                  <!-- Monedas de $1 -->
                   <tr>
                     <td class="text-center">
                       <label for="moneda1Cantidad" class="fw-bold"><i class="bi bi-currency-dollar"></i> 1</label>
@@ -695,8 +625,6 @@
                 </tbody>
               </table>
             </div>
-
-            <!-- Fondo de caja restante -->
             <div class="d-flex justify-content-center align-items-center mt-3">
               <p class="fw-bold fs-4 me-3 mb-0">
                 Fondo:
@@ -709,8 +637,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal para Ayuda -->
   <div class="modal fade" id="ayudaModal" tabindex="-1" aria-labelledby="ayudaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -719,51 +645,42 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <h6><strong>Paso 1: Configurar el tipo de cambio</strong></h6>
+          <h6><strong>(Opcional) Paso 1: Configurar el tipo de cambio</strong></h6>
           <p>Antes de generar el corte de caja, asegúrate de configurar el tipo de cambio. Para hacerlo, haz clic en el
-            botón con el ícono de <i class="bi bi-currency-dollar"></i> en la parte superior. Esto abrirá un modal donde
+            botón con el ícono de <i class="bi bi-currency-dollar fw-bold"></i> en la parte superior. Esto abrirá un modal donde
             podrás ingresar el tipo de cambio actual de dólares.</p>
-
           <h6><strong>Paso 2: Ingresar los datos de las sucursales</strong></h6>
           <p>En la pantalla principal, verás formularios separados para las sucursales (Librerías y Tiendas). Ingresa
-            los
-            siguientes datos para cada una:</p>
+            los siguientes datos para cada una:</p>
           <ul>
             <li><strong>Total</strong> ( <i class="bi bi-cash-stack fs-5"></i> ): El monto total de ventas del día.</li>
             <li><strong>Tarjeta</strong> ( <i class="bi bi-credit-card fs-5"></i> ): El monto de ventas hechas con
               tarjeta.</li>
             <li><strong>Dólares</strong> ( <i class="bi bi-currency-dollar fs-5"></i> ): El monto recibido en dólares
-              (si
-              aplica).
+              (si aplica).
             </li>
             <li><strong>Vales</strong> ( <i class="bi bi-ticket-perforated fs-5"></i> ): Puedes agregar uno o más vales
-              utilizando
-              el botón con el ícono de <i class="bi bi-plus-circle"></i>.</li>
+              utilizando el botón con el ícono de <i class="bi bi-plus-circle"></i>.</li>
           </ul>
-
           <h6><strong>Paso 3: Agregar vales</strong></h6>
-          <p>Para agregar vales, haz clic en el botón con el ícono <i class="bi bi-plus-circle"></i> en la sección de
+          <>Para agregar vales, haz clic en el botón con el ícono <i class="bi bi-plus-circle"></i> en la sección de
             vales. Esto desplegará la opción para agregar el <i>Vale</i> en el cual se deberá incluir una descripción y
-            el monto del mismo.</p>
-
+            el monto del mismo. Una vez ingresados los valores correspondientes, da click en el botón <i class="bi bi-save2 bg-success text-light p-1 rounded-2"></i> para gurdarlo.<br/>
+            <strong class="text-danger">NOTA: </strong>Si no das click en el botón de guardar <i class="bi bi-save2 bg-success text-light p-1 rounded-2"></i> <strong>NO</strong> aparecerá en el reporte del corte</p>
           <h6><strong>Paso 4: Verificar si alcanzarás a cobrar la nómina</strong></h6>
           <p>Si deseas verificar si podrás cobrar tu nómina, haz clic en el botón con el ícono de <i
               class="bi bi-wallet2"></i> en la parte superior. Se abrirá un modal donde puedes ingresar tu nómina y
-            otros
-            datos para hacer el cálculo. El sistema validará lo siguiente:</p>
+            otros datos para hacer el cálculo. El sistema validará lo siguiente:</p>
           <ul>
             <li><strong class="text-success">Borde Verde:</strong> Si el efectivo disponible es mayor o igual a tu
-              nómina,
-              se te mostrará un indicador de éxito.</li>
+              nómina, se te mostrará un indicador de éxito.</li>
             <li><strong class="text-danger">Borde Rojo:</strong> Si no tienes suficiente efectivo, se te mostrará un
               indicador de denegación.</li>
           </ul>
-
           <h6><strong>Paso 5: Generar el corte de caja</strong></h6>
           <p>Una vez que hayas ingresado todos los datos de las sucursales, haz clic en el botón <span
               class="bg-primary text-light p-1 rounded-2">Generar Corte</span> en la parte superior. Esto generará un
             reporte con el resumen de las ventas por sucursal el cual se deberá de copiar y pegar en el correo.</p>
-
           <h6><strong>Preguntas Frecuentes</strong></h6>
           <p><strong>P: ¿Cómo agrego un vale?</strong><br>
             R: Haz clic en "Agregar Vale", completa los campos y presiona el botón con el ícono de guardar.</p>
@@ -774,8 +691,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Bootstrap JS y Popper.js -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="./renderer.js"></script>
 </body>

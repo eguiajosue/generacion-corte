@@ -79,3 +79,6 @@ jspm_packages/
 .env.production
 
 .idea
+
+# Include the dist folder
+dist/
