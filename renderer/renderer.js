@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(tooltip => {
       new bootstrap.Tooltip(tooltip)
     })
-    
+
   let tipoCambioGlobal = 1.0; // Variable global
 
   // Listas para almacenar los vales por cada sucursal
@@ -61,6 +61,16 @@ document.addEventListener("DOMContentLoaded", () => {
       maximumFractionDigits: 2,
     };
     return new Intl.NumberFormat("es-MX", opciones).format(valor);
+  }
+
+  function obtenerFechaActual() {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, "0");
+    const mes = hoy.getMonth() + 1;
+    const año = hoy.getFullYear();
+    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    const mesLargo = meses[mes - 1];
+    return `${dia}-${mesLargo}-${año}`;
   }
 
   // Función para mostrar/ocultar el input de agregar vales
@@ -177,6 +187,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(totalValesId).value = totalVales.toFixed(2);
   }
 
+  function actualizarElemento(id, valor) {
+    const elemento = document.getElementById(id);
+    elemento.textContent = formatearMoneda(valor);
+    if (valor < 0) {
+      elemento.classList.add('text-danger');
+    } else {
+      elemento.classList.remove('text-danger');
+    }
+  }
+
   // Función para generar el reporte
   function actualizarReporte(
     ubicacion,
@@ -189,20 +209,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const efectivo = calcularEfectivo(total, tarjeta, vales);
     const pesos = calcularPesos(efectivo, dolares);
 
-    function actualizarElemento(id, valor) {
-      const elemento = document.getElementById(id);
-      elemento.textContent = formatearMoneda(valor);
-      if (valor < 0) {
-        elemento.classList.add('text-danger');
-      } else {
-        elemento.classList.remove('text-danger');
-      }
-    }
+
 
     actualizarElemento(`reporte-total${ubicacion}`, total);
     actualizarElemento(`reporte-tarjeta${ubicacion}`, tarjeta);
     actualizarElemento(`reporte-vales${ubicacion}`, vales);
     actualizarElemento(`reporte-efectivo${ubicacion}`, efectivo);
+
+    document.getElementById(`reporte-fecha${ubicacion}`).textContent = obtenerFechaActual();
 
     document.getElementById(
       `reporte-total${ubicacion}`
@@ -237,11 +251,11 @@ document.addEventListener("DOMContentLoaded", () => {
     listaValesElement.innerHTML =
       listaVales.length > 0
         ? listaVales
-            .map(
-              (vale) =>
-                `(${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)})`
-            )
-            .join("<br>")
+          .map(
+            (vale) =>
+              `(${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)})`
+          )
+          .join("<br>")
         : "";
   }
 

@@ -23,7 +23,8 @@ function createWindow() {
 
   win.maximize();
 
-  win.loadFile('renderer/index.html');
+  win.loadFile(path.join(__dirname, 'renderer/index.html'));
+
 }
 
 //Crear el menú con las pestañas "File" y "Ayuda"

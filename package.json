@@ -33,9 +33,9 @@
     ],
     "files": [
       "main.js",
-      "renderer.js",
-      "index.html",
-      "package.json"
+      "renderer/**",
+      "preload.js",
+      "tipoCambio.json"
     ],
     "win": {
       "target": "nsis",
