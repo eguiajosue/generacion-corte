@@ -1,6 +1,6 @@
 {
   "name": "generador-corte",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aplicacion de escritorio que genera el corte de caja de un establecimiento",
   "main": "main.js",
   "type": "module",
@@ -68,7 +68,6 @@
     "dotenv-cli": "^7.4.2",
     "electron": "^32.1.2",
     "electron-builder": "^25.1.7",
-    "electron-log": "^5.2.0",
     "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^8.57.1",
     "eslint-config-standard": "^17.1.0",
@@ -77,6 +76,7 @@
     "eslint-plugin-promise": "^6.6.0"
   },
   "dependencies": {
+    "electron-log": "^5.2.0",
     "electron-updater": "^6.3.9",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5"

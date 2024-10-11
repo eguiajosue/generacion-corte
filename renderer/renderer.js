@@ -497,4 +497,32 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleInputMode();
     calcularValores();
   });
+
+  // Mostrar notificación cuando hay una actualización disponible
+  window.electronAPI.onUpdateAvailable(() => {
+    const notification = new Notification('Actualización Disponible', {
+      body: 'Hay una nueva actualización disponible. Se descargará en segundo plano.',
+    });
+  });
+
+  window.electronAPI.onUpdateAvailable(() => {
+    new Notification('Actualización Disponible', {
+      body: 'Hay una nueva actualización disponible. Se descargará en segundo plano.',
+    });
+  });
+
+  // Mostrar notificación cuando la actualización se haya descargado
+  window.electronAPI.onUpdateDownloaded(() => {
+    new Notification('Actualización Descargada', {
+      body: 'La actualización ha sido descargada. Haz clic para reiniciar y aplicar.',
+    });
+
+    // Botón para reiniciar y aplicar la actualización
+    const button = document.createElement('button');
+    button.textContent = 'Reiniciar para actualizar';
+    button.onclick = () => {
+      window.electronAPI.restartApp();  // Llamar a la función para reiniciar
+    };
+    document.body.appendChild(button);
+  });
 });

@@ -39,9 +39,10 @@ autoUpdater.on('checking-for-updates', () => {
   log.info('Revisando actualizaciones...');
 })
 
-autoUpdater.on('update-available', (info) => {
+autoUpdater.on('update-available', () => {
   log.info('Actualización disponible.');
-})
+  BrowserWindow.getAllWindows()[0].webContents.send('update_available');
+});
 
 autoUpdater.on('update-not-available', (info) => {
   log.info('No hay actualizaciones disponibles.');
@@ -54,6 +55,11 @@ autoUpdater.on('error', (err) => {
 autoUpdater.on('download-progress', (progressObj) => {
   log.info(`Descargando actualización ${progressObj.percent}%`);
 })
+
+autoUpdater.on('update-downloaded', () => {
+  log.info('Actualización descargada; reiniciando.');
+  BrowserWindow.getAllWindows()[0].webContents.send('update_downloaded');
+});
 
 //Crear el menú con las pestañas "File" y "Ayuda"
 const template = [
