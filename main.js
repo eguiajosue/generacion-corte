@@ -3,11 +3,19 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
+
+import log from 'electron-log';
+
 // Definir __filename y __dirname en módulos ES6
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const tipoCambioFilePath = path.join(__dirname, 'tipoCambio.json');
+
+log.transports.file.resolvePathFn = () => path.join(__dirname, 'main.log');
+log.log(`Aplication version: ${app.getVersion()}`)
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -26,6 +34,26 @@ function createWindow() {
   win.loadFile(path.join(__dirname, 'renderer/index.html'));
 
 }
+
+autoUpdater.on('checking-for-updates', () => {
+  log.info('Revisando actualizaciones...');
+})
+
+autoUpdater.on('update-available', (info) => {
+  log.info('Actualización disponible.');
+})
+
+autoUpdater.on('update-not-available', (info) => {
+  log.info('No hay actualizaciones disponibles.');
+})
+
+autoUpdater.on('error', (err) => {
+  log.error('Error al actualizar:', err);
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  log.info(`Descargando actualización ${progressObj.percent}%`);
+})
 
 //Crear el menú con las pestañas "File" y "Ayuda"
 const template = [
@@ -64,6 +92,8 @@ const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
 app.whenReady().then(() => {
+  
+  autoUpdater.checkForUpdatesAndNotify();
   createWindow();
 
 });

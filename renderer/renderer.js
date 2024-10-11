@@ -250,13 +250,14 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     listaValesElement.innerHTML =
       listaVales.length > 0
-        ? listaVales
+        ? `(${listaVales
           .map(
             (vale) =>
-              `(${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)})`
+              `${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)}`
           )
-          .join("<br>")
+          .join(", ")})`
         : "";
+
   }
 
   // Función para calcular el efectivo

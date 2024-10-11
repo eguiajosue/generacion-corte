@@ -6,12 +6,22 @@
   "type": "module",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
-  },
+    "build": "dotenv electron-builder",
+    "build:win": "dotenv electron-builder --win",
+    "release": "dotenv electron-builder -p always"
+  }, 
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eguiajosue/generacion-corte.git"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "eguiajosue",
+      "repo": "generacion-corte",
+      "releaseType": "release"
+    }
+  ],
   "author": "Josue Eguia",
   "license": "ISC",
   "bugs": {
@@ -35,16 +45,27 @@
       "main.js",
       "renderer/**",
       "preload.js",
-      "tipoCambio.json"
+      "tipoCambio.json",
+      "assets/**",
+      "!**/*.env"
     ],
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "license": "licence.md",
+      "allowToChangeInstallationDirectory": false
     }
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
     "electron": "^32.1.2",
     "electron-builder": "^25.1.7",
+    "electron-log": "^5.2.0",
     "electron-reload": "^2.0.0-alpha.1",
     "electron-updater": "^6.3.9",
     "eslint": "^8.57.1",
