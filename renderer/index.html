@@ -143,7 +143,7 @@
               </button>
             </div> -->
             <div class="d-flex align-items-center">
-              <button type="button" class="btn btn-primary btn-sm d-flex align-items-center"
+              <button type="button" class="btn btn-primary-outline btn-sm d-flex align-items-center"
                 data-bs-toggle="modal" data-bs-target="#ayudaModal">
                 <i class="bi bi-question-circle me-2"></i>Cómo Usar
               </button>
@@ -693,6 +693,32 @@
       </div>
     </div>
   </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toastUpdateAvailable" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Actualización Disponible</strong>
+        <small>Ahora</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Hay una nueva actualización disponible. Se descargará en segundo plano.
+      </div>
+    </div>
+  
+    <div id="toastUpdateDownloaded" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Actualización Descargada</strong>
+        <small>Ahora</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        La actualización ha sido descargada. Haz clic en "Reiniciar" para aplicar los cambios.
+        <button class="btn btn-primary mt-2" id="restartButton">Reiniciar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="./renderer.js"></script>
 </body>

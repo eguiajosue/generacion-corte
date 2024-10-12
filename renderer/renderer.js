@@ -1,11 +1,30 @@
 const { ipcRenderer } = require("electron");
 
-document.addEventListener("DOMContentLoaded", () => {
+// Función para formatear moneda
+function formatearMoneda(valor) {
+  const opciones = {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  };
+  return new Intl.NumberFormat("es-MX", opciones).format(valor);
+}
 
-  document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    .forEach(tooltip => {
-      new bootstrap.Tooltip(tooltip)
-    })
+// Función para obtener la fecha actual
+function obtenerFechaActual() {
+  const hoy = new Date();
+  const dia = String(hoy.getDate()).padStart(2, "0");
+  const mes = hoy.getMonth() + 1;
+  const año = hoy.getFullYear();
+  const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+  const mesLargo = meses[mes - 1];
+  return `${dia}-${mesLargo}-${año}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Inicializar tooltips de Bootstrap
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => new bootstrap.Tooltip(tooltip));
 
   let tipoCambioGlobal = 1.0; // Variable global
 
@@ -15,10 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let valesTienda1 = [];
   let valesTienda2 = [];
 
+  // Mostrar modal de ayuda
   ipcRenderer.on("mostrar-ayuda-modal", () => {
-    const ayudaModal = new bootstrap.Modal(
-      document.getElementById("ayudaModal")
-    );
+    const ayudaModal = new bootstrap.Modal(document.getElementById("ayudaModal"));
     ayudaModal.show();
   });
 
@@ -40,40 +58,42 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    ipcRenderer.send("guardar-tipo-cambio", tipoCambio); // Enviar el nuevo tipo de cambio
+    ipcRenderer.send("guardar-tipo-cambio", tipoCambio);
     tipoCambioGlobal = tipoCambio; // Actualiza la variable global con el nuevo valor
+    document.getElementById("tipoCambioActual").value = tipoCambio; // Actualiza el valor en pantalla
 
-    // Actualizar también el campo de la pantalla principal
-    document.getElementById("tipoCambioActual").value = tipoCambio;
-
-    // Cerrar el modal
+    // Cerrar el modal de tipo de cambio
     const modalElement = document.querySelector("#tipoCambioModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
     modal.hide();
   });
 
-  // Función para formatear moneda
-  function formatearMoneda(valor) {
-    const opciones = {
-      style: "currency",
-      currency: "MXN",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    };
-    return new Intl.NumberFormat("es-MX", opciones).format(valor);
+  // Función para mostrar el toast de Bootstrap
+  function showToast(toastId) {
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
   }
 
-  function obtenerFechaActual() {
-    const hoy = new Date();
-    const dia = String(hoy.getDate()).padStart(2, "0");
-    const mes = hoy.getMonth() + 1;
-    const año = hoy.getFullYear();
-    const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-    const mesLargo = meses[mes - 1];
-    return `${dia}-${mesLargo}-${año}`;
-  }
+  // Mostrar notificación cuando haya una actualización disponible
+  ipcRenderer.on('update_available', () => {
+    showToast('toastUpdateAvailable');
+  });
 
-  // Función para mostrar/ocultar el input de agregar vales
+  // Mostrar notificación cuando la actualización esté lista para instalar
+  ipcRenderer.on('update_downloaded', () => {
+    showToast('toastUpdateDownloaded');
+
+    const restartButton = document.getElementById('restartButton');
+    if (!restartButton.classList.contains('event-bound')) {
+      restartButton.classList.add('event-bound');
+      restartButton.addEventListener('click', () => {
+        ipcRenderer.send('restart_app');
+      });
+    }
+  });
+
+  // Función para alternar la visibilidad del input de vales
   function toggleValeInput(ubicacion) {
     const entradaVales = document.getElementById(`entradaVales${ubicacion}`);
     if (entradaVales.classList.contains("d-none")) {
@@ -85,42 +105,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Lógica para mostrar el input de agregar vale en cada formulario
   ["1", "2", "3", "4"].forEach((ubicacion) => {
-    document
-      .getElementById(`mostrarEntradaVales${ubicacion}`)
-      .addEventListener("click", () => {
-        toggleValeInput(ubicacion);
-      });
+    document.getElementById(`mostrarEntradaVales${ubicacion}`).addEventListener("click", () => {
+      toggleValeInput(ubicacion);
+    });
 
-    document
-      .getElementById(`guardarVale${ubicacion}`)
-      .addEventListener("click", () => {
-        const descripcion =
-          document.getElementById(`valeDescripcion${ubicacion}`).value ||
-          "Sin descripción";
-        const valor =
-          parseFloat(document.getElementById(`valeValor${ubicacion}`).value) ||
-          0;
+    document.getElementById(`guardarVale${ubicacion}`).addEventListener("click", () => {
+      const descripcion = document.getElementById(`valeDescripcion${ubicacion}`).value || "Sin descripción";
+      const valor = parseFloat(document.getElementById(`valeValor${ubicacion}`).value) || 0;
 
-        if (valor <= 0) {
-          alert("Por favor, ingresa un valor válido para el vale.");
-          return;
-        }
+      if (valor <= 0) {
+        alert("Por favor, ingresa un valor válido para el vale.");
+        return;
+      }
 
-        const valesList = getValesListByUbicacion(ubicacion);
-        agregarVale(
-          `vales-lista${ubicacion}`,
-          descripcion,
-          valor,
-          getTotalValesId(ubicacion),
-          valesList,
-          ubicacion
-        );
+      const valesList = getValesListByUbicacion(ubicacion);
+      agregarVale(`vales-lista${ubicacion}`, descripcion, valor, getTotalValesId(ubicacion), valesList, ubicacion);
 
-        // Resetear los campos después de agregar el vale
-        document.getElementById(`valeDescripcion${ubicacion}`).value = "";
-        document.getElementById(`valeValor${ubicacion}`).value = "";
-        toggleValeInput(ubicacion); // Ocultar de nuevo el input
-      });
+      // Resetear los campos después de agregar el vale
+      document.getElementById(`valeDescripcion${ubicacion}`).value = "";
+      document.getElementById(`valeValor${ubicacion}`).value = "";
+      toggleValeInput(ubicacion); // Ocultar de nuevo el input
+    });
   });
 
   // Función para obtener el ID correcto de total de vales según la ubicación
@@ -135,19 +140,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Función para agregar vale al contenedor
-  function agregarVale(
-    containerId,
-    descripcion,
-    valor,
-    totalValesId,
-    valesList,
-    ubicacion
-  ) {
+  function agregarVale(containerId, descripcion, valor, totalValesId, valesList, ubicacion) {
     const container = document.getElementById(containerId);
-
     const valeDiv = document.createElement("div");
-    valeDiv.className =
-      "vale-item d-flex justify-content-between align-items-center mb-1";
+    valeDiv.className = "vale-item d-flex justify-content-between align-items-center mb-1";
 
     const descripcionSpan = document.createElement("span");
     descripcionSpan.textContent = descripcion;
@@ -163,9 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     eliminarBtn.innerHTML = "&times;";
     eliminarBtn.addEventListener("click", () => {
       container.removeChild(valeDiv);
-      const index = valesList.findIndex(
-        (v) => v.descripcion === descripcion && v.valor === valor
-      );
+      const index = valesList.findIndex(v => v.descripcion === descripcion && v.valor === valor);
       if (index !== -1) {
         valesList.splice(index, 1);
       }
@@ -198,18 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Función para generar el reporte
-  function actualizarReporte(
-    ubicacion,
-    total,
-    tarjeta,
-    vales,
-    dolares,
-    listaVales
-  ) {
+  function actualizarReporte(ubicacion, total, tarjeta, vales, dolares, listaVales) {
     const efectivo = calcularEfectivo(total, tarjeta, vales);
     const pesos = calcularPesos(efectivo, dolares);
-
-
 
     actualizarElemento(`reporte-total${ubicacion}`, total);
     actualizarElemento(`reporte-tarjeta${ubicacion}`, tarjeta);
@@ -218,59 +203,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById(`reporte-fecha${ubicacion}`).textContent = obtenerFechaActual();
 
-    document.getElementById(
-      `reporte-total${ubicacion}`
-    ).textContent = formatearMoneda(total);
-    document.getElementById(
-      `reporte-tarjeta${ubicacion}`
-    ).textContent = formatearMoneda(tarjeta);
-    document.getElementById(
-      `reporte-vales${ubicacion}`
-    ).textContent = formatearMoneda(vales);
-    document.getElementById(
-      `reporte-efectivo${ubicacion}`
-    ).textContent = formatearMoneda(efectivo);
-
     if (dolares > 0) {
-      document.getElementById(`dolares-pesos${ubicacion}`).style.display =
-        "block";
-      document.getElementById(
-        `reporte-dolares${ubicacion}`
-      ).textContent = formatearMoneda(dolares);
-      document.getElementById(
-        `reporte-pesos${ubicacion}`
-      ).textContent = formatearMoneda(pesos);
+      document.getElementById(`dolares-pesos${ubicacion}`).style.display = "block";
+      document.getElementById(`reporte-dolares${ubicacion}`).textContent = formatearMoneda(dolares);
+      document.getElementById(`reporte-pesos${ubicacion}`).textContent = formatearMoneda(pesos);
     } else {
-      document.getElementById(`dolares-pesos${ubicacion}`).style.display =
-        "none";
+      document.getElementById(`dolares-pesos${ubicacion}`).style.display = "none";
     }
 
-    const listaValesElement = document.getElementById(
-      `reporte-listaVales${ubicacion}`
-    );
-    listaValesElement.innerHTML =
-      listaVales.length > 0
-        ? `(${listaVales
-          .map(
-            (vale) =>
-              `${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)}`
-          )
-          .join(", ")})`
-        : "";
-
+    const listaValesElement = document.getElementById(`reporte-listaVales${ubicacion}`);
+    listaValesElement.innerHTML = listaVales.length > 0 ? `(${listaVales.map(vale => `${vale.descripcion.toUpperCase()}: ${formatearMoneda(vale.valor)}`).join(", ")})` : "";
   }
 
-  // Función para calcular el efectivo
   function calcularEfectivo(total, tarjeta, vales) {
     return total - tarjeta - vales;
   }
 
-  // Función para calcular los pesos a partir del efectivo y los dólares
   function calcularPesos(efectivo, dolares) {
     return efectivo - dolares * tipoCambioGlobal;
   }
 
-  // Función para obtener la lista de vales por ubicación
   function getValesListByUbicacion(ubicacion) {
     switch (ubicacion) {
       case "1":
@@ -288,114 +240,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Lógica para generar el reporte al hacer clic en "Generar Corte"
   document.getElementById("generarCorte").addEventListener("click", () => {
-    const totalLibreria1 =
-      parseFloat(document.getElementById("totalLibreria1").value) || 0;
-    const tarjetaLibreria1 =
-      parseFloat(document.getElementById("tarjetaLibreria1").value) || 0;
-    const valesLibreria1Total =
-      parseFloat(document.getElementById("totalValesLibreria1").value) || 0;
-    const dolaresLibreria1 =
-      parseFloat(document.getElementById("dolaresLibreria1").value) || 0;
+    const totalLibreria1 = parseFloat(document.getElementById("totalLibreria1").value) || 0;
+    const tarjetaLibreria1 = parseFloat(document.getElementById("tarjetaLibreria1").value) || 0;
+    const valesLibreria1Total = parseFloat(document.getElementById("totalValesLibreria1").value) || 0;
+    const dolaresLibreria1 = parseFloat(document.getElementById("dolaresLibreria1").value) || 0;
 
-    actualizarReporte(
-      "Libreria1",
-      totalLibreria1,
-      tarjetaLibreria1,
-      valesLibreria1Total,
-      dolaresLibreria1,
-      valesLibreria1
-    );
+    actualizarReporte("Libreria1", totalLibreria1, tarjetaLibreria1, valesLibreria1Total, dolaresLibreria1, valesLibreria1);
 
-    const totalLibreria2 =
-      parseFloat(document.getElementById("totalLibreria2").value) || 0;
-    const tarjetaLibreria2 =
-      parseFloat(document.getElementById("tarjetaLibreria2").value) || 0;
-    const valesLibreria2Total =
-      parseFloat(document.getElementById("totalValesLibreria2").value) || 0;
-    const dolaresLibreria2 =
-      parseFloat(document.getElementById("dolaresLibreria2").value) || 0;
+    const totalLibreria2 = parseFloat(document.getElementById("totalLibreria2").value) || 0;
+    const tarjetaLibreria2 = parseFloat(document.getElementById("tarjetaLibreria2").value) || 0;
+    const valesLibreria2Total = parseFloat(document.getElementById("totalValesLibreria2").value) || 0;
+    const dolaresLibreria2 = parseFloat(document.getElementById("dolaresLibreria2").value) || 0;
 
     if (totalLibreria2 === 0) {
       document.getElementById("reporte-libreria2").style.display = "none";
     } else {
       document.getElementById("reporte-libreria2").style.display = "block";
-      actualizarReporte(
-        "Libreria2",
-        totalLibreria2,
-        tarjetaLibreria2,
-        valesLibreria2Total,
-        dolaresLibreria2,
-        valesLibreria2
-      );
+      actualizarReporte("Libreria2", totalLibreria2, tarjetaLibreria2, valesLibreria2Total, dolaresLibreria2, valesLibreria2);
     }
 
-    const totalTienda1 =
-      parseFloat(document.getElementById("totalTienda1").value) || 0;
-    const tarjetaTienda1 =
-      parseFloat(document.getElementById("tarjetaTienda1").value) || 0;
-    const valesTienda1Total =
-      parseFloat(document.getElementById("totalValesTienda1").value) || 0;
-    const dolaresTienda1 =
-      parseFloat(document.getElementById("dolaresTienda1").value) || 0;
+    const totalTienda1 = parseFloat(document.getElementById("totalTienda1").value) || 0;
+    const tarjetaTienda1 = parseFloat(document.getElementById("tarjetaTienda1").value) || 0;
+    const valesTienda1Total = parseFloat(document.getElementById("totalValesTienda1").value) || 0;
+    const dolaresTienda1 = parseFloat(document.getElementById("dolaresTienda1").value) || 0;
 
-    actualizarReporte(
-      "Tienda1",
-      totalTienda1,
-      tarjetaTienda1,
-      valesTienda1Total,
-      dolaresTienda1,
-      valesTienda1
-    );
+    actualizarReporte("Tienda1", totalTienda1, tarjetaTienda1, valesTienda1Total, dolaresTienda1, valesTienda1);
 
-    const totalTienda2 =
-      parseFloat(document.getElementById("totalTienda2").value) || 0;
-    const tarjetaTienda2 =
-      parseFloat(document.getElementById("tarjetaTienda2").value) || 0;
-    const valesTienda2Total =
-      parseFloat(document.getElementById("totalValesTienda2").value) || 0;
-    const dolaresTienda2 =
-      parseFloat(document.getElementById("dolaresTienda2").value) || 0;
+    const totalTienda2 = parseFloat(document.getElementById("totalTienda2").value) || 0;
+    const tarjetaTienda2 = parseFloat(document.getElementById("tarjetaTienda2").value) || 0;
+    const valesTienda2Total = parseFloat(document.getElementById("totalValesTienda2").value) || 0;
+    const dolaresTienda2 = parseFloat(document.getElementById("dolaresTienda2").value) || 0;
 
-    actualizarReporte(
-      "Tienda2",
-      totalTienda2,
-      tarjetaTienda2,
-      valesTienda2Total,
-      dolaresTienda2,
-      valesTienda2
-    );
+    actualizarReporte("Tienda2", totalTienda2, tarjetaTienda2, valesTienda2Total, dolaresTienda2, valesTienda2);
 
     document.getElementById("reporte").classList.remove("d-none");
   });
 
   // Verificar si alcanzarás la nómina
   document.getElementById("verificarNomina").addEventListener("click", () => {
-    // Obtener los valores de los campos
     const miNomina = parseFloat(document.getElementById("miNomina").value) || 0;
-    const totalVentas =
-      parseFloat(document.getElementById("nominaTotal").value) || 0;
-    const montoDolares =
-      parseFloat(document.getElementById("nominaDolares").value) || 0;
-    const montoVales =
-      parseFloat(document.getElementById("nominaVales").value) || 0;
-    const montoTarjeta =
-      parseFloat(document.getElementById("nominaTarjeta").value) || 0;
+    const totalVentas = parseFloat(document.getElementById("nominaTotal").value) || 0;
+    const montoDolares = parseFloat(document.getElementById("nominaDolares").value) || 0;
+    const montoVales = parseFloat(document.getElementById("nominaVales").value) || 0;
+    const montoTarjeta = parseFloat(document.getElementById("nominaTarjeta").value) || 0;
 
     const miNominaInput = document.getElementById("miNomina");
-
-    // Limpiar clases anteriores
     miNominaInput.classList.remove("input-error", "input-success");
 
-    // Calcular el efectivo disponible usando la fórmula proporcionada
     const dolaresEnPesos = montoDolares * tipoCambioGlobal;
     const efectivo = totalVentas - dolaresEnPesos - montoVales - montoTarjeta;
 
-    // Verificar si el efectivo es suficiente para cubrir la nómina
     if (efectivo >= miNomina) {
-      // Si alcanza, poner el borde verde
       miNominaInput.classList.add("input-success");
     } else {
-      // Si no alcanza, poner el borde rojo
       miNominaInput.classList.add("input-error");
     }
   });
@@ -438,7 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const cantidadInput = document.getElementById(denominacion.idCantidad);
       const numeroInput = document.getElementById(denominacion.idNumero);
 
-      // Evento para cuando se ingresa cantidad en pesos
       cantidadInput.addEventListener("input", () => {
         const cantidad = parseFloat(cantidadInput.value) || 0;
         const numeroBilletes = Math.floor(cantidad / denominacion.valor); // Redondear hacia abajo
@@ -446,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarFondo();
       });
 
-      // Evento para cuando se ingresa número de billetes/monedas
       numeroInput.addEventListener("input", () => {
         const numero = parseInt(numeroInput.value) || 0;
         const cantidad = numero * denominacion.valor;
@@ -496,33 +391,5 @@ document.addEventListener("DOMContentLoaded", () => {
   inputModeBilletes.addEventListener("change", () => {
     toggleInputMode();
     calcularValores();
-  });
-
-  // Mostrar notificación cuando hay una actualización disponible
-  window.electronAPI.onUpdateAvailable(() => {
-    const notification = new Notification('Actualización Disponible', {
-      body: 'Hay una nueva actualización disponible. Se descargará en segundo plano.',
-    });
-  });
-
-  window.electronAPI.onUpdateAvailable(() => {
-    new Notification('Actualización Disponible', {
-      body: 'Hay una nueva actualización disponible. Se descargará en segundo plano.',
-    });
-  });
-
-  // Mostrar notificación cuando la actualización se haya descargado
-  window.electronAPI.onUpdateDownloaded(() => {
-    new Notification('Actualización Descargada', {
-      body: 'La actualización ha sido descargada. Haz clic para reiniciar y aplicar.',
-    });
-
-    // Botón para reiniciar y aplicar la actualización
-    const button = document.createElement('button');
-    button.textContent = 'Reiniciar para actualizar';
-    button.onclick = () => {
-      window.electronAPI.restartApp();  // Llamar a la función para reiniciar
-    };
-    document.body.appendChild(button);
   });
 });

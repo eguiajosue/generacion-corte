@@ -2,10 +2,8 @@ import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-
 import pkg from 'electron-updater';
 const { autoUpdater } = pkg;
-
 import log from 'electron-log';
 
 // Definir __filename y __dirname en módulos ES6
@@ -15,10 +13,15 @@ const __dirname = path.dirname(__filename);
 const tipoCambioFilePath = path.join(__dirname, 'tipoCambio.json');
 
 log.transports.file.resolvePathFn = () => path.join(__dirname, 'main.log');
-log.log(`Aplication version: ${app.getVersion()}`)
+log.log(`Application version: ${app.getVersion()}`);
+
+let win;
+
+autoUpdater.autoDownload = false; // No descargar automáticamente
+autoUpdater.autoInstallOnAppQuit = true;
 
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 500,
     height: 1200,
     fullscreen: false,
@@ -30,38 +33,41 @@ function createWindow() {
   });
 
   win.maximize();
-
   win.loadFile(path.join(__dirname, 'renderer/index.html'));
-
 }
 
 autoUpdater.on('checking-for-updates', () => {
   log.info('Revisando actualizaciones...');
-})
+});
 
 autoUpdater.on('update-available', () => {
   log.info('Actualización disponible.');
-  BrowserWindow.getAllWindows()[0].webContents.send('update_available');
+  win.webContents.send('update_available'); // Enviar notificación de actualización
 });
 
-autoUpdater.on('update-not-available', (info) => {
+autoUpdater.on('update-not-available', () => {
   log.info('No hay actualizaciones disponibles.');
-})
+});
 
 autoUpdater.on('error', (err) => {
   log.error('Error al actualizar:', err);
-})
+});
 
 autoUpdater.on('download-progress', (progressObj) => {
   log.info(`Descargando actualización ${progressObj.percent}%`);
-})
-
-autoUpdater.on('update-downloaded', () => {
-  log.info('Actualización descargada; reiniciando.');
-  BrowserWindow.getAllWindows()[0].webContents.send('update_downloaded');
 });
 
-//Crear el menú con las pestañas "File" y "Ayuda"
+autoUpdater.on('update-downloaded', () => {
+  log.info('Actualización descargada; lista para instalar.');
+  win.webContents.send('update_downloaded'); // Notificar que la actualización está lista
+});
+
+// IPC para iniciar manualmente la descarga
+ipcMain.on('download-update', () => {
+  autoUpdater.downloadUpdate(); // Iniciar la descarga manualmente
+});
+
+// Menú personalizado
 const template = [
   {
     label: 'File',
@@ -75,7 +81,7 @@ const template = [
       },
       {
         label: 'Exit',
-        role: 'quit', // Rol de salida predeterminado
+        role: 'quit',
       },
     ],
   },
@@ -85,23 +91,19 @@ const template = [
       {
         label: 'Cómo Usar',
         click: () => {
-          // Enviar un evento al proceso de renderizado para mostrar el modal de ayuda
-          BrowserWindow.getAllWindows()[0].webContents.send('mostrar-ayuda-modal');
+          win.webContents.send('mostrar-ayuda-modal'); // Mostrar ayuda
         },
       },
     ],
   },
 ];
 
-// Aplicar el menú
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
 app.whenReady().then(() => {
-  
-  autoUpdater.checkForUpdatesAndNotify();
   createWindow();
-
+  autoUpdater.checkForUpdatesAndNotify(); // Mover aquí la verificación de actualizaciones
 });
 
 app.on('window-all-closed', function () {
@@ -123,7 +125,6 @@ ipcMain.on('cargar-tipo-cambio', (event) => {
 ipcMain.on('guardar-tipo-cambio', (event, tipoCambio) => {
   const tipoCambioData = { tipoCambio: tipoCambio };
   try {
-    // Sobrescribe el archivo con el nuevo tipo de cambio
     fs.writeFileSync(tipoCambioFilePath, JSON.stringify(tipoCambioData), 'utf8');
     event.sender.send('tipo-cambio-guardado');
   } catch (error) {
